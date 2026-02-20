@@ -18,6 +18,8 @@ Live Monitoring: alert_system.py
 My work on this Network IDS is fundamentally grounded in my published research:
 Title: Fraud and Money Laundering Pattern Detection Using Logistic Regression, Random Forest, and XGBoost 
 DOI: https://doi.org/10.5281/zenodo.17984808
-Abstract Summary: 
+
+
+**Abstract Summary:**
 This study analyzed over 6.3 million transactions to evaluate machine learning models.It demonstrated that ensemble approaches, specifically Random Forest and XGBoost, 
 are more effective than Logistic Regression in detecting rare anomalies within imbalanced datasets.
