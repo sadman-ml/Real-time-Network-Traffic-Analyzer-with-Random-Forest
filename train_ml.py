@@ -1,54 +1,142 @@
+"""Network Intrusion Detection Project
+Student Version.
+Steps:
+1. Load Data
+2. Clean Data
+3. Encode Categorical Features
+4. Create Anomaly Label
+5. Prepare Data (Train-Test Split)
+6. Train Random Forest Model
+7. Evaluate Model
+8. Save Model
+9. Display Suspicious IPs
+"""
+
 import pandas as pd
+import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import classification_report
-import joblib # এটি উপরে ইমপোর্ট করে নিন
+from sklearn.metrics import classification_report, confusion_matrix
 
-# ১. ডেটা লোড করা
+# =========================
+# 1. Load Dataset
+# =========================
+
 try:
-    df = pd.read_csv('network_log.csv')
-    print(f"Dataset loaded successfully with {len(df)} packets.")
+    df = pd.read_csv("network_log.csv")
+    print("Dataset loaded successfully☺️.")
 except FileNotFoundError:
-    print("Error: network_log.csv ফাইলটি পাওয়া যায়নি!")
+    print("File not found⚠️")
     exit()
 
-# ২. ফিচার ইঞ্জিনিয়ারিং
-le_src = LabelEncoder()
-le_dst = LabelEncoder()
-le_proto = LabelEncoder()
+# =========================
+# 2. Data Cleaning
+# =========================
+# Remove rows with missing important values.
 
-df['src_id'] = le_src.fit_transform(df['Source IP'])
-df['dst_id'] = le_dst.fit_transform(df['Destination IP'])
-df['proto_id'] = le_proto.fit_transform(df['Protocol'])
+df = df.dropna(subset=["Source IP", "Destination IP", "Protocol"])
+df = df.reset_index(drop=True)
 
-# ৩. টার্গেট লেবেল তৈরি
-threshold = 1000
-counts = df['Source IP'].value_counts()
-df['is_anomaly'] = df['Source IP'].apply(lambda x: 1 if counts[x] > threshold else 0)
+print("Data cleaned successfully.")
 
-# ৪. ফিচার এবং টার্গেট সেট করা
-X = df[['src_id', 'dst_id', 'proto_id']]
-y = df['is_anomaly']
+# =========================
+# 3. Feature Engineering
+# =========================
+# Machine learning models cannot understand text,
+# so we convert IP addresses and protocol into numbers.
 
-# ৫. ডেটা ভাগ করা
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+le_source = LabelEncoder()
+le_destination = LabelEncoder()
+le_protocol = LabelEncoder()
 
-# ৬. Random Forest মডেল ট্রেনিং
-model = RandomForestClassifier(n_estimators=100, random_state=42)
+df["source_id"] = le_source.fit_transform(df["Source IP"])
+df["destination_id"] = le_destination.fit_transform(df["Destination IP"])
+df["protocol_id"] = le_protocol.fit_transform(df["Protocol"])
+
+print("Feature encoding completed.")
+
+# =========================
+# 4. Create Target Label
+# =========================
+# If a source IP appears more than 1000 times,
+# we consider it suspicious.
+
+THRESHOLD = 1000
+ip_counts = df["Source IP"].value_counts()
+
+df["is_anomaly"] = df["Source IP"].map(
+    lambda ip: 1 if ip_counts[ip] > THRESHOLD else 0
+)
+
+print("Anomaly labels created.")
+
+# Check class distribution
+print("\nClass Distribution:")
+print(df["is_anomaly"].value_counts())
+
+# =========================
+# 5. Prepare Data
+# =========================
+
+X = df[["source_id", "destination_id", "protocol_id"]]
+y = df["is_anomaly"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# =========================
+# 6. Train Model
+# =========================
+
+model = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42,
+    class_weight="balanced"
+)
+
 model.fit(X_train, y_train)
+print("Model training completed.")
 
-# ৭. রেজাল্ট দেখা
+# =========================
+# 7. Evaluate Model
+# =========================
+y_pred = model.predict(X_test)
+
 accuracy = model.score(X_test, y_test)
-print(f"\nMODEL ACCURACY: {accuracy * 100:.2f}%")
 
-# ৮. মডেল এবং এনকোডার সেভ করা (লুপের বাইরে রাখবেন)
-joblib.dump(model, 'network_model.pkl')
-joblib.dump(le_src, 'le_src.pkl') 
-print("Model and Encoder saved successfully!")
+print("\nModel Evaluation:")
+print(f"Accuracy: {accuracy * 100:.2f}%")
 
-# সন্দেহজনক আইপি শনাক্ত করা
-suspicious_ips = df[df['is_anomaly'] == 1]['Source IP'].unique()
-print(f"\n[ Detected Suspicious IPs ]")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nNote: High recall for anomaly class is critical in Intrusion Detection.")
+
+# =========================
+# Feature Importance
+# =========================
+
+print("\nFeature Importance:")
+for name, importance in zip(X.columns, model.feature_importances_):
+    print(f"{name}: {importance:.4f}")
+    
+# =========================
+# 8. Save Model
+# =========================
+joblib.dump(model, "network_model.pkl")
+print("Model saved successfully.")
+
+# =========================
+# 9. Show Suspicious IPs
+# =========================
+suspicious_ips = df[df["is_anomaly"] == 1]["Source IP"].unique()
+
+print("\nDetected Suspicious IPs:")
 for ip in suspicious_ips:
     print(f"⚠️ {ip}")
