@@ -1,5 +1,6 @@
 **Real-time Network IDS (Random Forest)**
-This project is a machine learning-based Intrusion Detection System (IDS) that analyzes live network traffic to identify anomalies.
+
+***This project is a machine learning-based Intrusion Detection System (IDS) that analyzes live network traffic to identify anomalies.***
 
 **Key Highlights**
 Model: Powered by Random Forest Classifier, achieving 100% test accuracy.
