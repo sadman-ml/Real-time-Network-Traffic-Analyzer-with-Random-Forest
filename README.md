@@ -1,4 +1,4 @@
-# Real-time Network IDS (Random Forest)
+# Real-time Network IDS .
 ***This project is a machine learning-based Intrusion Detection System (IDS) that analyzes live network traffic to identify anomalies.***
 
 # Key Highlights
