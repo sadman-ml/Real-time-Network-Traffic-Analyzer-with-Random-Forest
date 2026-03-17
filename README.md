@@ -1,8 +1,7 @@
-**Real-time Network IDS (Random Forest)**
-
+# Real-time Network IDS (Random Forest)
 ***This project is a machine learning-based Intrusion Detection System (IDS) that analyzes live network traffic to identify anomalies.***
 
-**Key Highlights**
+# Key Highlights
 Model: Powered by Random Forest Classifier, achieving 100% test accuracy.
 
 Real-time Alerts: Features an integrated Audio Beep system for immediate threat notification.
@@ -11,7 +10,7 @@ EDA: Dynamic visualization of Protocol distribution and Source IP frequency.
 
 Live Analysis: Successfully analyzed 9,400+ live packets (TCP, UDP, IGMP).
 
-**Methodology**
+# Methodology
 Based on the systematic approach from my paper:
 
 Data Capture: main.py 
@@ -22,12 +21,11 @@ Model Training: train_ml.py
 
 Live Monitoring: alert_system.py
 #
-**Related Research**
+# Related Research
 My work on this Network IDS is fundamentally grounded in my published research:
 
-Title: Fraud and Money Laundering Pattern Detection Using Logistic Regression, Random Forest, and XGBoost 
-
-DOI: https://doi.org/10.5281/zenodo.17984808
+# Title: Fraud and Money Laundering Pattern Detection Using Logistic Regression, Random Forest, and XGBoost 
+**DOI**: https://doi.org/10.5281/zenodo.17984808
 
 
 **Abstract Summary:**
